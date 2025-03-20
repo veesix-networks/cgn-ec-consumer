@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "cgn-ec-consumer"
+version = "0.1.0"
+description = ""
+authors = ["BSpendlove <8687668+BSpendlove@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+confluent-kafka = "^2.8.2"
+structlog = "^25.2.0"
+cgn-ec-models = "^0.1.1"
+pydantic = "^2.7.0"
+pydantic-settings = "^2.2.1"
+pyyaml = "^6.0.1"
+regex = "^2024.11.6"
+requests = "^2.32.3"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,10 @@
+README.md
+CHANGELOG.md
+docker-compose.yml
+Dockerfile
+.git
+.gitattributes
+.gitignore
+logs
+*.log
+tests
