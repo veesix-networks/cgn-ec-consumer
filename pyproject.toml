@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cgn-ec-consumer"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["BSpendlove <8687668+BSpendlove@users.noreply.github.com>"]
 readme = "README.md"
