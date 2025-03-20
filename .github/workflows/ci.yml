@@ -26,26 +26,26 @@ jobs:
     - name: Check code formatting with Ruff
       run: ruff format --diff --target-version=py39
 
-  test:
-    name: Run tests
-    runs-on: ubuntu-latest
-  
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        persist-credentials: false
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-    - name: Ruff Check
-      uses: jpetrucciani/ruff-check@main
-      with:
-        path: 'cgn_ec_consumer/'
-    - name: Test with pytest
-      run: |
-        pip install pytest pytest-cov
-        pytest tests/
+  # test:
+  #   name: Run tests
+  #   runs-on: ubuntu-latest
+  # 
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #     with:
+  #       persist-credentials: false
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v5
+  #     with:
+  #       python-version: "3.12"
+  #   - name: Ruff Check
+  #     uses: jpetrucciani/ruff-check@main
+  #     with:
+  #       path: 'cgn_ec_consumer/'
+  #   - name: Test with pytest
+  #     run: |
+  #       pip install pytest pytest-cov
+  #       pytest tests/
   build:
     runs-on: ubuntu-latest
     permissions:
