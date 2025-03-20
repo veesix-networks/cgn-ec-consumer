@@ -2,8 +2,8 @@ import os
 import yaml
 import json
 import importlib
-from typing import Any, Dict, List, Optional, Type, Union
-from pydantic import BaseModel, field_validator
+from typing import Any, Dict, Optional, Type
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
 from cgn_ec_consumer.handlers.generic import GenericSyslogHandler
