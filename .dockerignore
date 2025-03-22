@@ -7,4 +7,4 @@ Dockerfile
 .gitignore
 logs
 *.log
-tests
+tests/
