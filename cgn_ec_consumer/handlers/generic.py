@@ -33,7 +33,11 @@ class BaseNetFlowBaseHandler(BaseHandler):
     pass
 
 
-class NetFlowV9Handler(BaseHandler):
+class GenericNetFlowV9Handler(BaseHandler):
+    pass
+
+
+class GenericRADIUSAccountingHandler(BaseHandler):
     pass
 
 
