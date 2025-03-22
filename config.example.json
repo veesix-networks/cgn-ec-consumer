@@ -1,17 +1,17 @@
 {
   "kafka_bootstrap_servers": "localhost:9094",
-  "kafka_group_id": "syslog-consumers",
+  "kafka_group_id": "accounting-consumers",
   "kafka_max_records_poll": 500,
   "batch_size": 30000,
   
   "handler": {
-    "type": "cgn_ec_consumer.handlers.nfware.NFWareSyslogHandler",
+    "type": "NFWareRADIUSAccountingHandler",
     "options": {}
   },
   
   "outputs": [
     {
-      "type": "cgn_ec_consumer.outputs.timescaledb.TimeScaleDBOutput",
+      "type": "TimeScaleDBOutput",
       "options": {
         "address": "tsdb",
         "port": 5432,

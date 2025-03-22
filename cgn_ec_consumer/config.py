@@ -6,7 +6,11 @@ from typing import Any, Dict, Optional, Type
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
-from cgn_ec_consumer.handlers.generic import GenericSyslogHandler
+from cgn_ec_consumer.handlers.generic import (
+    GenericSyslogHandler,
+    GenericRADIUSAccountingHandler,
+    GenericNetFlowV9Handler,
+)
 from cgn_ec_consumer.outputs.base import BaseOutput
 
 
@@ -38,20 +42,34 @@ class Settings(BaseSettings):
     BATCH_SIZE: int = 30000
 
     # Default configuration that will be overridden by file if provided
-    HANDLER: GenericSyslogHandler | None = None
+    HANDLER: (
+        GenericSyslogHandler
+        | GenericRADIUSAccountingHandler
+        | GenericNetFlowV9Handler
+        | None
+    ) = None
     OUTPUTS: list[BaseOutput] = []
 
-    def load_handler(self, handler_config: HandlerConfig) -> Type[GenericSyslogHandler]:
+    def load_handler(
+        self, handler_config: HandlerConfig
+    ) -> Type[
+        GenericSyslogHandler | GenericRADIUSAccountingHandler | GenericNetFlowV9Handler
+    ]:
         """Load handler class from configuration."""
         try:
-            module_path, class_name = handler_config.type.rsplit(".", 1)
-            module = importlib.import_module(module_path)
-            handler_class = getattr(module, class_name)
+            module = importlib.import_module("cgn_ec_consumer.handlers")
+            handler_class = getattr(module, handler_config.type)
 
-            # Validate that it's a subclass of GenericSyslogHandler
-            if not issubclass(handler_class, GenericSyslogHandler):
+            if not issubclass(
+                handler_class,
+                (
+                    GenericSyslogHandler,
+                    GenericRADIUSAccountingHandler,
+                    GenericNetFlowV9Handler,
+                ),
+            ):
                 raise ValueError(
-                    f"Handler {handler_config.type} is not a subclass of GenericSyslogHandler"
+                    f"Handler {handler_config.type} is not a subclass of either GenericSyslogHandler, GenericRADIUSAccountingHandler or GenericNetFlowV9Handler"
                 )
 
             return handler_class
@@ -61,9 +79,8 @@ class Settings(BaseSettings):
     def load_output(self, output_config: OutputConfig) -> BaseOutput:
         """Load and instantiate output from configuration."""
         try:
-            module_path, class_name = output_config.type.rsplit(".", 1)
-            module = importlib.import_module(module_path)
-            output_class = getattr(module, class_name)
+            module = importlib.import_module("cgn_ec_consumer.outputs")
+            output_class = getattr(module, output_config.type)
 
             # Validate that it's a subclass of BaseOutput
             if not issubclass(output_class, BaseOutput):
