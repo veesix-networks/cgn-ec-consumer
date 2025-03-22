@@ -14,17 +14,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-    - name: Install the code linting and formatting tool Ruff
-      run: pipx install ruff
-    - name: Lint code with Ruff
-      run: ruff check --output-format=github --target-version=py39
-    - name: Check code formatting with Ruff
-      run: ruff format --diff --target-version=py39
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run ruff
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "format --check --diff"
 
   # test:
   #   name: Run tests
