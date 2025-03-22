@@ -9,42 +9,6 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  lint:
-    name: Lint and Check Format
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Run ruff
-        uses: astral-sh/ruff-action@v3
-        with:
-          args: "format --check --diff"
-
-  # test:
-  #   name: Run tests
-  #   runs-on: ubuntu-latest
-  # 
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #     with:
-  #       persist-credentials: false
-  #   - name: Set up Python
-  #     uses: actions/setup-python@v5
-  #     with:
-  #       python-version: "3.12"
-  #   - name: Ruff Check
-  #     uses: jpetrucciani/ruff-check@main
-  #     with:
-  #       path: 'cgn_ec_consumer/'
-  #   - name: Test with pytest
-  #     run: |
-  #       pip install pytest pytest-cov
-  #       pytest tests/
   build:
     runs-on: ubuntu-latest
     permissions:
