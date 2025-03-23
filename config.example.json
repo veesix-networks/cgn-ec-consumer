@@ -19,7 +19,34 @@
         "password": "password123",
         "database": "cgnat",
         "batch_size": 30000
-      }
+      },
+      "preprocessors": [
+        {
+          "name": "filter_keys",
+          "arguments": {
+            "keys": [
+              "src_ip",
+              "src_port",
+              "x_ip",
+              "x_port",
+              "timestamp",
+              "dst_ip",
+              "dst_port",
+              "event",
+              "type"
+            ]
+          }
+        },
+        {
+          "name": "match_kvs",
+          "arguments": {
+            "kvs": {
+              "src_ip": "192.168.1.20",
+              "type": "session-mapping"
+            }
+          }
+        }
+      ]
     }
   ]
 }

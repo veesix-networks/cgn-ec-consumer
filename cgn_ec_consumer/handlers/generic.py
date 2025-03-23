@@ -11,9 +11,20 @@ class BaseHandler(ABC):
 
     def __init__(self, outputs: list[BaseOutput] = []):
         logger.info(f"Loading Handler: {self.__class__.__name__}")
-        logger.info(
-            f"Outputs loaded: {', '.join([x.__class__.__name__ for x in outputs])}"
-        )
+        output_info = []
+        for x in outputs:
+            class_name = x.__class__.__name__
+            if len(x.preprocessors) > 0:
+                preprocessor_names = ", ".join(
+                    [preprocessor.name for preprocessor in x.preprocessors]
+                )
+                output_info.append(
+                    f"{class_name} ({len(x.preprocessors)} preprocessors - {preprocessor_names})"
+                )
+            else:
+                output_info.append(class_name)
+
+        logger.info(f"Outputs loaded: {', '.join(output_info)}")
         self._outputs = outputs
 
     @abstractmethod
@@ -22,6 +33,12 @@ class BaseHandler(ABC):
 
     def process_outputs(self, metrics: list[dict]):
         for output in self._outputs:
+            if output.preprocessors:
+                metrics = output._preprocess_metrics(metrics)
+
+            if not metrics:
+                continue
+
             output.process_metrics(metrics)
 
 

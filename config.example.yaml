@@ -21,10 +21,27 @@ outputs:
       database: "cgnat"
       batch_size: 30000
 
-  # Example HTTP Output
-  # - type: "HTTPOutput"
+  # - type: "HTTPWebhookOutput"
   #   options:
-  #     url: "http://example.com/api/metrics"
+  #     url: "http://localhost/test"
   #     headers:
-  #       Authorization: "Bearer token123"
+  #       x-api-key: default-change-me
   #     timeout: 10
+  #   preprocessors:
+  #     - name: filter_keys
+  #       arguments:
+  #         keys:
+  #           - src_ip
+  #           - src_port
+  #           - x_ip
+  #           - x_port
+  #           - timestamp
+  #           - dst_ip
+  #           - dst_port
+  #           - event
+  #           - type
+  #     - name: match_kvs
+  #       arguments:
+  #         kvs:
+  #           src_ip: 192.168.1.20
+  #           type: session-mapping
