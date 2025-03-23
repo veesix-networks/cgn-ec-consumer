@@ -27,6 +27,7 @@ class TimeScaleDBOutput(BaseOutput):
         password: str,
         database: str = "cgnat",
         batch_size: int = 10000,
+        preprocessors: list[str] = [],
     ):
         self.address = address
         self.port = port
@@ -34,6 +35,7 @@ class TimeScaleDBOutput(BaseOutput):
         self.password = password
         self.database = database
         self.batch_size = batch_size
+        self.preprocessors = preprocessors
         self._engine: Engine = None
         self._session: Session = None
 

@@ -76,8 +76,10 @@ def print_metrics_count(metrics_count: Value):
 
         logger.info(
             "Metric statistics",
-            total_metrics_processed=f"Total metrics processed: {current_count}",
-            avg_metrics_per_second=f"Average metrics per second: {avg_metrics_per_second:.2f}",
+            total_metrics_processed=current_count,
+            avg_metrics_per_second=f"{avg_metrics_per_second:.2f}"
+            if avg_metrics_per_second
+            else 0,
         )
 
         # Update previous metrics and time for the next iteration

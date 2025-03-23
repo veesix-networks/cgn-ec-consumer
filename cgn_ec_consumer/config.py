@@ -14,6 +14,11 @@ from cgn_ec_consumer.handlers.generic import (
 from cgn_ec_consumer.outputs.base import BaseOutput
 
 
+class PreProcessorConfig(BaseModel):
+    name: str
+    arguments: dict[str, Any] = {}
+
+
 class HandlerConfig(BaseModel):
     type: str
     options: Dict[str, Any] = {}
@@ -22,6 +27,7 @@ class HandlerConfig(BaseModel):
 class OutputConfig(BaseModel):
     type: str
     options: Dict[str, Any] = {}
+    preprocessors: list[PreProcessorConfig] = []
 
 
 class ConfigModel(BaseModel):
@@ -89,7 +95,10 @@ class Settings(BaseSettings):
                 )
 
             # Instantiate the output with options from config
-            return output_class(**output_config.options)
+            output = output_class(**output_config.options)
+            if output_config.preprocessors:
+                output.preprocessors = output_config.preprocessors
+            return output
         except (ImportError, AttributeError, ValueError) as e:
             raise ImportError(f"Failed to load output {output_config.type}: {str(e)}")
 
