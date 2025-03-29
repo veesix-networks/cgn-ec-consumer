@@ -16,6 +16,7 @@ pyyaml = "^6.0.1"
 regex = "^2024.11.6"
 requests = "^2.32.3"
 psycopg = {extras = ["binary"], version = "^3.2.6"}
+kafka-python-ng = "^2.2.3"
 
 
 [tool.poetry.group.dev.dependencies]
