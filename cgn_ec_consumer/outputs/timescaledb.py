@@ -72,22 +72,29 @@ class TimeScaleDBOutput(BaseOutput):
         }
 
         for metric in metrics:
-            metric_type = metric.pop("type", None)
-            match metric_type:
-                case NATEventEnum.SESSION_MAPPING:
-                    event_map[NATSessionMapping].append(metric)
-                    # stmt = insert(NATSessionMapping).values(metric)
-                case NATEventEnum.ADDRESS_MAPPING:
-                    event_map[NATAddressMapping].append(metric)
-                    # stmt = insert(NATAddressMapping).values(metric)
-                case NATEventEnum.PORT_MAPPING:
-                    event_map[NATPortMapping].append(metric)
-                    # stmt = insert(NATPortMapping).values(metric)
-                case NATEventEnum.PORT_BLOCK_MAPPING:
-                    event_map[NATPortBlockMapping].append(metric)
-                    # stmt = insert(NATPortBlockMapping).values(metric)
-                case _:
-                    continue
+            # We temporarily process the metric without 'type' and then add it back
+            # in the event other metrics want to deal with it
+            metric_type = metric.get("type")
+            if not metric_type:
+                continue
+
+            type_value = None
+            if "type" in metric:
+                type_value = metric.pop("type")
+
+            try:
+                match metric_type:
+                    case NATEventEnum.SESSION_MAPPING:
+                        event_map[NATSessionMapping].append(metric)
+                    case NATEventEnum.ADDRESS_MAPPING:
+                        event_map[NATAddressMapping].append(metric)
+                    case NATEventEnum.PORT_MAPPING:
+                        event_map[NATPortMapping].append(metric)
+                    case NATEventEnum.PORT_BLOCK_MAPPING:
+                        event_map[NATPortBlockMapping].append(metric)
+            finally:
+                if type_value is not None:
+                    metric["type"] = type_value
 
         conn = self._engine.raw_connection()
         try:

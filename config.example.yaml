@@ -20,6 +20,12 @@ outputs:
       password: "password123"
       database: "cgnat"
       batch_size: 30000
+  # - type: "KafkaOutput"
+  #   options:
+  #     bootstrap_servers: "localhost:9094"
+  #     topic: "cgnat.events"
+  #     key_field: "x_ip"  # Possible values: x_ip, x_port, dst_ip, dst_port, src_ip, src_port
+  #     producer_extra_config: {}
 
   # - type: "HTTPWebhookOutput"
   #   options:

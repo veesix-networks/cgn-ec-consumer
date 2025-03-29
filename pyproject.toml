@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cgn-ec-consumer"
-version = "0.3.0"
+version = "0.4.0"
 description = ""
 authors = ["BSpendlove <8687668+BSpendlove@users.noreply.github.com>"]
 readme = "README.md"
@@ -16,6 +16,7 @@ pyyaml = "^6.0.1"
 regex = "^2024.11.6"
 requests = "^2.32.3"
 psycopg = {extras = ["binary"], version = "^3.2.6"}
+kafka-python-ng = "^2.2.3"
 
 
 [tool.poetry.group.dev.dependencies]
