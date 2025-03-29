@@ -23,7 +23,7 @@ class KafkaOutput(BaseOutput):
             NATEventEnum.PORT_BLOCK_MAPPING.value: "cgnat.events.portblockmapping",
         },
         key_field: Optional[str] = None,
-        kafka_producer_config: dict = {},
+        producer_extra_config: dict = {},
         preprocessors: list[str] = [],
     ):
         self.bootstrap_servers = bootstrap_servers
@@ -31,13 +31,13 @@ class KafkaOutput(BaseOutput):
         self.default_topic = default_topic
         self.topic_event_map = topic_event_map
         self.key_field = key_field
-        self.kafka_producer_config = kafka_producer_config
+        self.producer_extra_config = producer_extra_config
         self.preprocessors = preprocessors
 
         self._producer = KafkaProducer(
             bootstrap_servers=self.bootstrap_servers,
             value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-            **self.kafka_producer_config,
+            **self.producer_extra_config,
         )
 
     def process_metrics(self, metrics: list[dict]):
