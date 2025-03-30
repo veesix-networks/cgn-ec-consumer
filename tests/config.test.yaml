@@ -20,10 +20,17 @@ outputs:
       database: "cgnat"
       batch_size: 30000
 
-  # Example HTTP Output (commented)
+  # Example HTTP Output
   - type: "cgn_ec_consumer.outputs.http.HTTPOutput"
     options:
       url: "http://example.com/api/metrics"
       headers:
         Authorization: "Bearer token123"
       timeout: 10
+
+  # Example Redis Output
+  - type: "RedisOutput"
+    options:
+      host: redis
+      port: 6379
+      key_field: src_ip
