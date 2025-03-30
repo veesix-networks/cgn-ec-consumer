@@ -19,7 +19,7 @@ def generate_syslog_message_session_mapping():
     event = random.choice(["A", "D"])  # Event can be "A" or "D"
     vrf_id = 0  # Random VRF ID
     protocol = random.choice([6, 17])  # TCP (6) or UDP (17)
-    src_ip = "100.64.23.122"
+    src_ip = random_ip()
     src_port = random_port()
     x_ip = "194.15.97.34"  # Example external IP (fixed for now)
     x_port = random_port()
