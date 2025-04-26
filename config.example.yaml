@@ -1,6 +1,6 @@
 # Global Configuration Settings
 kafka_bootstrap_servers: "localhost:9094"
-kafka_group_id: "syslog-consumers"
+kafka_group_id: "syslog-consumers-j"
 kafka_max_records_poll: 500
 batch_size: 30000
 
@@ -12,21 +12,20 @@ handler:
 # Outputs Configuration
 outputs:
   # TimeScaleDB Output
-  - type: "TimeScaleDBOutput"
-    options:
-      address: "tsdb"
-      port: 5432
-      username: "cgnat"
-      password: "password123"
-      database: "cgnat"
-      batch_size: 30000
+  # - type: "TimeScaleDBOutput"
+  #   options:
+  #     address: "tsdb"
+  #     port: 5432
+  #     username: "cgnat"
+  #     password: "password123"
+  #     database: "cgnat"
+  #     batch_size: 30000
   # - type: "KafkaOutput"
   #   options:
   #     bootstrap_servers: "localhost:9094"
   #     topic: "cgnat.events"
   #     key_field: "x_ip"  # Possible values: x_ip, x_port, dst_ip, dst_port, src_ip, src_port
   #     producer_extra_config: {}
-
   # - type: "HTTPWebhookOutput"
   #   options:
   #     url: "http://localhost/test"
@@ -51,3 +50,10 @@ outputs:
   #         kvs:
   #           src_ip: 192.168.1.20
   #           type: session-mapping
+  # AMQP Output
+  # - type: "AMQPOutput"
+  #   options:
+  #     host: "localhost"
+  #     port: 5672
+  #     username: cgnec
+  #     password: cgnec

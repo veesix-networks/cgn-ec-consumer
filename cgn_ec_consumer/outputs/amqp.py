@@ -2,7 +2,7 @@ import json
 from typing import Optional
 
 from structlog import get_logger
-from amqp import Connection
+from amqp import Connection, Message
 
 from cgn_ec_models.enums import NATEventEnum
 from cgn_ec_consumer.outputs.base import BaseOutput
@@ -53,7 +53,7 @@ class AMQPOutput(BaseOutput):
             **self.connection_extra_config,
         )
         self._channel = self._connection.channel()
-        
+
         # Declare the exchange if it doesn't exist
         self._channel.exchange_declare(
             exchange=self.exchange,
@@ -64,39 +64,43 @@ class AMQPOutput(BaseOutput):
 
     def process_metrics(self, metrics: list[dict]):
         processed_metrics = self._preprocess_metrics(metrics)
-        
+
+        logger.info("Attempting to process amqp metrics", metrics=processed_metrics)
         try:
             for metric in processed_metrics:
                 current_routing_key = self.routing_key
-                
+
                 if not current_routing_key and self.routing_key_event_map:
-                    if (event_type := metric.get("type")):
+                    if event_type := metric.get("type"):
                         logger.info(event_type, metric=metric)
-                        if routing_key := self.routing_key_event_map.get(event_type.value):
+                        if routing_key := self.routing_key_event_map.get(
+                            event_type.value
+                        ):
                             current_routing_key = routing_key
                         else:
                             current_routing_key = self.default_routing_key
-                
+
                 if not current_routing_key:
                     current_routing_key = self.default_routing_key
-                
+
                 # Convert metric to JSON and publish
                 message_body = json.dumps(metric).encode("utf-8")
-                
+
                 # Publish the message
                 self._channel.basic_publish(
+                    Message(
+                        body=message_body,
+                        content_type="application/json",
+                        delivery_mode=2,
+                    ),
                     exchange=self.exchange,
                     routing_key=current_routing_key,
-                    body=message_body,
-                    properties={
-                        "content_type": "application/json",
-                        "delivery_mode": 2,  # persistent delivery
-                    },
                 )
-                
+                logger.info("Published message to amqp", data=message_body)
+
         except Exception as err:
             logger.warning("Unable to process metrics", exception=str(err))
-    
+
     def __del__(self):
         # Attempt to close connection when object is garbage collected
         try:
