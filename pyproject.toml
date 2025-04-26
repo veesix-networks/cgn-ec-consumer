@@ -18,6 +18,7 @@ requests = "^2.32.3"
 psycopg = {extras = ["binary"], version = "^3.2.6"}
 kafka-python-ng = "^2.2.3"
 redis = "^5.2.1"
+prometheus-client = "^0.21.1"
 
 
 [tool.poetry.group.dev.dependencies]

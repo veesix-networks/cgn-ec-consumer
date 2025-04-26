@@ -34,6 +34,8 @@ class ConfigModel(BaseModel):
     kafka_bootstrap_servers: str = "localhost:9094"
     kafka_group_id: str = "syslog-consumers"
     kafka_max_records_poll: int = 500
+    processes: int = 8
+    metrics_port: int = 4499
     batch_size: int = 30000
     handler: HandlerConfig
     outputs: list[OutputConfig]
@@ -43,6 +45,10 @@ class Settings(BaseSettings):
     KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9094"
     KAFKA_GROUP_ID: str = "syslog-consumers"
     KAFKA_MAX_RECORDS_POLL: int = 500
+
+    PROCESSES: int = 8
+    METRICS_PORT: int = 4499
+    PROMETHEUS_MULTIPROC_DIR: str = "/tmp/prometheus_multiproc"
 
     CONFIG_FILE: Optional[str] = "config.yaml"
     BATCH_SIZE: int = 30000
@@ -128,6 +134,9 @@ class Settings(BaseSettings):
                 self.KAFKA_BOOTSTRAP_SERVERS = config.kafka_bootstrap_servers
                 self.KAFKA_GROUP_ID = config.kafka_group_id
                 self.KAFKA_MAX_RECORDS_POLL = config.kafka_max_records_poll
+                self.METRICS_PORT = config.metrics_port
+                self.PROCESSES = config.processes
+
                 self.BATCH_SIZE = config.batch_size
 
                 # Load handler
