@@ -57,7 +57,6 @@ class KafkaOutput(BaseOutput):
                     self.topic = self.default_topic
 
                 if (event_type := metric.get("type")) and not self.topic:
-                    logger.info(event_type, metric=metric)
                     if topic := self.topic_event_map.get(event_type.value):
                         self.topic = topic
                     else:

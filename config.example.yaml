@@ -1,6 +1,6 @@
 # Global Configuration Settings
 kafka_bootstrap_servers: "localhost:9094"
-kafka_group_id: "syslog-consumers-j"
+kafka_group_id: "syslog-consumers"
 kafka_max_records_poll: 500
 batch_size: 30000
 
@@ -12,14 +12,14 @@ handler:
 # Outputs Configuration
 outputs:
   # TimeScaleDB Output
-  # - type: "TimeScaleDBOutput"
-  #   options:
-  #     address: "tsdb"
-  #     port: 5432
-  #     username: "cgnat"
-  #     password: "password123"
-  #     database: "cgnat"
-  #     batch_size: 30000
+  - type: "TimeScaleDBOutput"
+    options:
+      address: "tsdb"
+      port: 5432
+      username: "cgnat"
+      password: "password123"
+      database: "cgnat"
+      batch_size: 30000
   # - type: "KafkaOutput"
   #   options:
   #     bootstrap_servers: "localhost:9094"

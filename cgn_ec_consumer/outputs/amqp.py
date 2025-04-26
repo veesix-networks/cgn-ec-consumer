@@ -64,15 +64,12 @@ class AMQPOutput(BaseOutput):
 
     def process_metrics(self, metrics: list[dict]):
         processed_metrics = self._preprocess_metrics(metrics)
-
-        logger.info("Attempting to process amqp metrics", metrics=processed_metrics)
         try:
             for metric in processed_metrics:
                 current_routing_key = self.routing_key
 
                 if not current_routing_key and self.routing_key_event_map:
                     if event_type := metric.get("type"):
-                        logger.info(event_type, metric=metric)
                         if routing_key := self.routing_key_event_map.get(
                             event_type.value
                         ):
@@ -83,10 +80,7 @@ class AMQPOutput(BaseOutput):
                 if not current_routing_key:
                     current_routing_key = self.default_routing_key
 
-                # Convert metric to JSON and publish
                 message_body = json.dumps(metric).encode("utf-8")
-
-                # Publish the message
                 self._channel.basic_publish(
                     Message(
                         body=message_body,
@@ -96,13 +90,10 @@ class AMQPOutput(BaseOutput):
                     exchange=self.exchange,
                     routing_key=current_routing_key,
                 )
-                logger.info("Published message to amqp", data=message_body)
-
         except Exception as err:
             logger.warning("Unable to process metrics", exception=str(err))
 
     def __del__(self):
-        # Attempt to close connection when object is garbage collected
         try:
             if hasattr(self, "_connection") and self._connection:
                 if hasattr(self, "_channel") and self._channel:
