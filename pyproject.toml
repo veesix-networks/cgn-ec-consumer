@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cgn-ec-consumer"
-version = "0.6.0"
+version = "0.7.0"
 description = ""
 authors = ["BSpendlove <8687668+BSpendlove@users.noreply.github.com>"]
 readme = "README.md"
@@ -19,6 +19,7 @@ psycopg = {extras = ["binary"], version = "^3.2.6"}
 kafka-python-ng = "^2.2.3"
 redis = "^5.2.1"
 prometheus-client = "^0.21.1"
+amqp = "^5.3.1"
 
 
 [tool.poetry.group.dev.dependencies]

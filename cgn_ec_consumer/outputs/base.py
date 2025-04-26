@@ -16,6 +16,9 @@ class BaseOutput(ABC):
         self.preprocessors = preprocessors
 
     def _preprocess_metrics(self, metrics: list[dict]) -> list[dict]:
+        if not self.preprocessors:
+            return metrics
+
         new_metrics = []
         for preprocessor in self.preprocessors:
             if preprocessor.name not in preprocessing:
