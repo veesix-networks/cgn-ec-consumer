@@ -93,13 +93,13 @@ def main():
     syslog_server_port = 1514  # Default UDP port for syslog
 
     for _ in range(10):  # Generate and send 10 random syslog messages
-        # message1 = generate_syslog_message_address_mapping()
+        message1 = generate_syslog_message_address_mapping()
         message2 = generate_syslog_message_session_mapping()
-        # message3 = generate_syslog_message_port_mapping()
-        # message4 = generate_syslog_message_port_block_mapping()
+        message3 = generate_syslog_message_port_mapping()
+        message4 = generate_syslog_message_port_block_mapping()
 
-        # messages = [message1, message2, message3, message4]
-        messages = [message2]
+        messages = [message1, message2, message3, message4]
+        # messages = [message2]
         for message in messages:
             print(f"Sending messages: {message}")
             send_syslog_message(message, syslog_server_ip, syslog_server_port)
