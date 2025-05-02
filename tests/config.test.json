@@ -1,35 +1,79 @@
 {
-  "kafka_bootstrap_servers": "localhost:9094",
-  "kafka_group_id": "syslog-consumers",
-  "kafka_max_records_poll": 500,
-  "batch_size": 30000,
-  
-  "handler": {
-    "type": "cgn_ec_consumer.handlers.nfware.NFWareSyslogHandler",
-    "options": {}
-  },
-  
-  "outputs": [
-    {
-      "type": "cgn_ec_consumer.outputs.timescaledb.TimeScaleDBOutput",
-      "options": {
-        "address": "tsdb",
-        "port": 5432,
-        "username": "cgnat",
-        "password": "password123",
-        "database": "cgnat",
-        "batch_size": 30000
-      }
+    "kafka_bootstrap_servers": "localhost:9094",
+    "kafka_group_id": "syslog-consumers",
+    "kafka_max_records_poll": 500,
+    "batch_size": 30000,
+    "handler": {
+      "type": "NFWareSyslogHandler",
+      "options": {}
     },
-    {
-      "type": "cgn_ec_consumer.outputs.http.HTTPOutput",
-      "options": {
-        "url": "http://example.com/api/metrics",
-        "headers": {
-          "Authorization": "Bearer token123"
+    "outputs": [
+      {
+        "type": "TimeScaleDBOutput",
+        "options": {
+          "address": "tsdb",
+          "port": 5432,
+          "username": "cgnat",
+          "password": "password123",
+          "database": "cgnat",
+          "batch_size": 30000
+        }
+      },
+      {
+        "type": "KafkaOutput",
+        "options": {
+          "bootstrap_servers": "localhost:9094",
+          "topic": "cgnat.events",
+          "key_field": "x_ip",
+          "producer_extra_config": {}
+        }
+      },
+      {
+        "type": "HTTPWebhookOutput",
+        "options": {
+          "url": "http://localhost/test",
+          "headers": {
+            "x-api-key": "default-change-me"
+          },
+          "timeout": 10
         },
-        "timeout": 10
+        "preprocessors": [
+          {
+            "name": "filter_keys",
+            "arguments": {
+              "keys": [
+                "src_ip",
+                "src_port",
+                "x_ip",
+                "x_port",
+                "timestamp",
+                "dst_ip",
+                "dst_port",
+                "event",
+                "type"
+              ]
+            }
+          },
+          {
+            "name": "match_kvs",
+            "arguments": {
+              "kvs": {
+                "src_ip": "192.168.1.20",
+                "type": "session-mapping"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "AMQPOutput",
+        "options": {
+          "host": "localhost",
+          "port": 5672,
+          "username": "cgnec",
+          "password": "cgnec"
+        }
       }
-    }
-  ]
-}
+    ]
+  }
+  

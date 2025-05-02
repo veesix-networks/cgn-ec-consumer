@@ -21,7 +21,6 @@ redis = "^5.2.1"
 prometheus-client = "^0.21.1"
 amqp = "^5.3.1"
 
-
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
 

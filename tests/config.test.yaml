@@ -1,4 +1,4 @@
-# CGN EC Consumer Configuration
+# Global Configuration Settings
 kafka_bootstrap_servers: "localhost:9094"
 kafka_group_id: "syslog-consumers"
 kafka_max_records_poll: 500
@@ -6,12 +6,12 @@ batch_size: 30000
 
 # Handler Configuration
 handler:
-  type: "cgn_ec_consumer.handlers.nfware.NFWareSyslogHandler"
-  options: {}  # Additional parameters if needed
+  type: "NFWareSyslogHandler"
+  options: {}
 
 # Outputs Configuration
 outputs:
-  - type: "cgn_ec_consumer.outputs.timescaledb.TimeScaleDBOutput"
+  - type: "TimeScaleDBOutput"
     options:
       address: "tsdb"
       port: 5432
@@ -19,18 +19,39 @@ outputs:
       password: "password123"
       database: "cgnat"
       batch_size: 30000
-
-  # Example HTTP Output
-  - type: "cgn_ec_consumer.outputs.http.HTTPOutput"
+  - type: "KafkaOutput"
     options:
-      url: "http://example.com/api/metrics"
+      bootstrap_servers: "localhost:9094"
+      topic: "cgnat.events"
+      key_field: "x_ip"  # Possible values: x_ip, x_port, dst_ip, dst_port, src_ip, src_port
+      producer_extra_config: {}
+  - type: "HTTPWebhookOutput"
+    options:
+      url: "http://localhost/test"
       headers:
-        Authorization: "Bearer token123"
+        x-api-key: default-change-me
       timeout: 10
-
-  # Example Redis Output
-  - type: "RedisOutput"
+    preprocessors:
+      - name: filter_keys
+        arguments:
+          keys:
+            - src_ip
+            - src_port
+            - x_ip
+            - x_port
+            - timestamp
+            - dst_ip
+            - dst_port
+            - event
+            - type
+      - name: match_kvs
+        arguments:
+          kvs:
+            src_ip: 192.168.1.20
+            type: session-mapping
+  - type: "AMQPOutput"
     options:
-      host: redis
-      port: 6379
-      key_field: src_ip
+      host: "localhost"
+      port: 5672
+      username: cgnec
+      password: cgnec
