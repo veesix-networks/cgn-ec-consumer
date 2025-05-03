@@ -52,6 +52,16 @@ pydantic = ">=2.10.6,<3.0.0"
 sqlmodel = ">=0.0.24,<0.0.25"
 
 [[package]]
+name = "cgn-ec-rust-parsers"
+version = "0.2.0"
+description = ""
+optional = false
+python-versions = "*"
+files = [
+    {file = "cgn_ec_rust_parsers-0.2.0-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:db41a59b6041b327402f93a3506b4cd1ee45bd33e61a6043c884687d11a7e9d9"},
+]
+
+[[package]]
 name = "charset-normalizer"
 version = "3.4.1"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
@@ -1056,4 +1066,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "380f2ae86e9cf0688bd22c539fe699826efb0a6a1d61c613b589b41da622c9f4"
+content-hash = "0c599471573ca9fc943eb42705dc02217dc93f8bd3a3ecd205d3e53085fa7657"
