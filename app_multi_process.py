@@ -79,21 +79,32 @@ def _process_metrics(
     handler_type = handler.__class__.__name__
 
     start_time = time()
-    metrics = []
+    messages = []
     failed_parses = 0
 
     for msg in records:
         try:
             message = json.loads(msg.value().decode("utf-8"))
-            metric = handler.parse_message(message)
-            if not metric:
-                failed_parses += 1
-                continue
-
-            metrics.append(metric)
+            messages.append(message)
         except Exception:
             failed_parses += 1
             continue
+
+    if not messages:
+        if failed_parses > 0:
+            PARSE_FAILURES.labels(process_id=process_id, handler_type=handler_type).inc(
+                failed_parses
+            )
+        consumer.commit()
+        return
+
+    try:
+        metrics = handler.parse_messages_batch(messages)
+        failed_parses += len(messages) - len(metrics)
+    except Exception as e:
+        logger.error(f"Batch processing error: {e}")
+        failed_parses += len(messages)
+        metrics = []
 
     if failed_parses > 0:
         PARSE_FAILURES.labels(process_id=process_id, handler_type=handler_type).inc(

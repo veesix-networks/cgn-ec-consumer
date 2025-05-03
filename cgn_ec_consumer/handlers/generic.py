@@ -40,6 +40,14 @@ class BaseHandler(ABC):
     def parse_message(self, message: str) -> dict:
         raise NotImplementedError("parse_message not implemented")
 
+    def parse_messages_batch(self, messages: list[dict]) -> list[dict]:
+        metrics = []
+        for message in messages:
+            metric = self.parse_message(message)
+            if metric:
+                metrics.append(metric)
+        return metrics
+
     def process_outputs(self, metrics: list[dict]):
         for output in self._outputs:
             if output.preprocessors:
@@ -121,3 +129,48 @@ class GenericSyslogHandler(BaseHandler):
                 return result
 
         logger.debug("Could not find a valid regex pattern to parse syslog message")
+
+    def parse_messages_batch(self, messages: list[dict]) -> list[dict]:
+        if (
+            not HAS_RUST_BINDINGS
+            or not self.regex
+            or not hasattr(self.regex, "match_messages_batch")
+        ):
+            metrics = []
+            for message in messages:
+                metric = self.parse_message(message)
+                if metric:
+                    metrics.append(metric)
+            return metrics
+
+        message_texts = []
+        host_ips = []
+        timestamps = []
+
+        for data in messages:
+            message_texts.append(data["message"])
+            host_ips.append(data["ip"])
+            timestamps.append(data["timestamp"])
+
+        try:
+            batch_results = self.regex.match_messages_batch(message_texts)
+
+            metrics = []
+            for i, result in enumerate(batch_results):
+                if result:
+                    parse_func, event_data = result
+                    parse_method = getattr(self, parse_func)
+                    metric = parse_method(event_data, host_ips[i], timestamps[i])
+                    metrics.append(metric)
+
+            return metrics
+        except Exception as err:
+            logger.debug("Failed to batch parse using rust binding", err=str(err))
+
+            # Fallback to sequential processing
+            metrics = []
+            for message in messages:
+                metric = self.parse_message(message)
+                if metric:
+                    metrics.append(metric)
+            return metrics
