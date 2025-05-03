@@ -1,9 +1,18 @@
 from abc import ABC, abstractmethod
 from structlog import get_logger
+import re
 
 from cgn_ec_consumer.outputs.base import BaseOutput
 
+try:
+    from cgn_ec_rust_parsers import RegexMatcher
+
+    HAS_RUST_BINDINGS = True
+except ImportError:
+    HAS_RUST_BINDINGS = False
+
 logger = get_logger("cgn-ec.handlers.generic")
+logger.debug("Checking status of rust bindings", HAS_RUST_BINDINGS=HAS_RUST_BINDINGS)
 
 
 class BaseHandler(ABC):
@@ -59,22 +68,56 @@ class GenericRADIUSAccountingHandler(BaseHandler):
 
 
 class GenericSyslogHandler(BaseHandler):
+    DEFAULT_REGEX_PATTERNS = []
     PATTERNS = []
+
+    def __init__(
+        self,
+        regex_patterns: list[dict] = [],
+        *args,
+        **kwargs,
+    ):
+        self.regex = None
+        if HAS_RUST_BINDINGS:
+            self.regex = RegexMatcher()
+            if self.regex:
+                for pattern in regex_patterns:
+                    self.regex.add_pattern(pattern["regex"], pattern["handler"])
+
+                for pattern in self.DEFAULT_REGEX_PATTERNS:
+                    self.regex.add_pattern(pattern["regex"], pattern["handler"])
+
+        for pattern in regex_patterns:
+            self.PATTERNS.append((re.compile(pattern["regex"]), pattern["handler"]))
+
+        super().__init__(*args, **kwargs)
 
     def parse_message(self, data: dict) -> dict:
         syslog_message = data["message"]
         host_ip = data["ip"]
         timestamp = data["timestamp"]
 
-        for compiled_pattern, parse_func in self.PATTERNS:
-            has_match = compiled_pattern.search(syslog_message)
-            if not has_match:
-                continue
+        if HAS_RUST_BINDINGS and self.regex:
+            try:
+                result = self.regex.match_message(syslog_message)
+                if result:
+                    parse_func, event_data = result
+                    parse_method = getattr(self, parse_func)
+                    return parse_method(event_data, host_ip, timestamp)
+            except Exception as err:
+                logger.debug(
+                    "Failed to parse using rust binding due to an error", err=str(err)
+                )
+                pass
+        else:
+            for compiled_pattern, parse_func in self.PATTERNS:
+                has_match = compiled_pattern.search(syslog_message)
+                if not has_match:
+                    continue
 
-            parse_method = getattr(self, parse_func)
-            event_data = has_match.groups()
-
-            result = parse_method(event_data, host_ip, timestamp)
-            return result
+                parse_method = getattr(self, parse_func)
+                event_data = has_match.groupdict()
+                result = parse_method(event_data, host_ip, timestamp)
+                return result
 
         logger.debug("Could not find a valid regex pattern to parse syslog message")

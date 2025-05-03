@@ -5,8 +5,6 @@
 # Port Blocks: A VRF 0 INT 10.0.0.1 EXT 100.64.0.1:1024-1535
 # Typically deterministic CGN should be used with port ranges to avoid large logs
 
-import regex as re
-from typing import Any
 from datetime import datetime
 from structlog import get_logger
 from cgn_ec_models.enums import NATEventTypeEnum, NATEventEnum, NATProtocolEnum
@@ -15,7 +13,7 @@ from cgn_ec_consumer.handlers.generic import (
     GenericSyslogHandler,
     GenericRADIUSAccountingHandler,
 )
-
+from cgn_ec_consumer.patterns.nfware import NFWARE_SYSLOG_REGEX_PATTERNS
 
 logger = get_logger("cgn-ec.handlers.nfware")
 
@@ -117,26 +115,13 @@ class NFWareRADIUSAccountingHandler(GenericRADIUSAccountingHandler):
 
 class NFWareSyslogHandler(GenericSyslogHandler):
     TOPIC = "cgnat.syslog.nfware"
-
-    REGEX_ADDRESS_MAPPING = (
-        r"([AD]) VRF (\d+) INT (\d+\.\d+\.\d+\.\d+) EXT (\d+\.\d+\.\d+\.\d+)$"
-    )
-    REGEX_PORT_MAPPING = r"([AD]) VRF (\d+) (\d+) INT (\d+\.\d+\.\d+\.\d+):(\d+) EXT (\d+\.\d+\.\d+\.\d+):(\d+)$"
-    REGEX_SESSION_MAPPING = r"([AD]) VRF (\d+) (\d+) INT (\d+\.\d+\.\d+\.\d+):(\d+) EXT (\d+\.\d+\.\d+\.\d+):(\d+) DST (\d+\.\d+\.\d+\.\d+):(\d+) DIR (OUT|IN)$"
-    REGEX_PORT_BLOCK_MAPPING = r"([AD]) VRF (\d+) INT (\d+\.\d+\.\d+\.\d+) EXT (\d+\.\d+\.\d+\.\d+):(\d+)-(\d+)$"
-
-    PATTERNS = [
-        (re.compile(REGEX_SESSION_MAPPING), "parse_session_mapping"),
-        (re.compile(REGEX_PORT_MAPPING), "parse_port_mapping"),
-        (re.compile(REGEX_PORT_BLOCK_MAPPING), "parse_port_block_mapping"),
-        (re.compile(REGEX_ADDRESS_MAPPING), "parse_address_mapping"),
-    ]
+    DEFAULT_REGEX_PATTERNS = NFWARE_SYSLOG_REGEX_PATTERNS
 
     def parse_address_mapping(
-        self, data: tuple[str | Any], host_ip: str, timestamp: datetime
+        self, data: dict, host_ip: str, timestamp: datetime
     ) -> dict:
         __event_type__ = NATEventEnum.ADDRESS_MAPPING
-        if len(data) != 4:
+        if not all(key in data for key in ["event", "src_ip", "x_ip"]):
             return
 
         logger.debug("Parsing Address Mapping", data=data)
@@ -144,18 +129,19 @@ class NFWareSyslogHandler(GenericSyslogHandler):
             "type": __event_type__,
             "timestamp": timestamp,
             "host": host_ip,
-            "event": self.event_to_enum(data[0]),
-            "vrf_id": int(data[1]),
-            "src_ip": data[2],
-            "x_ip": data[3],
+            "event": self.event_to_enum(data["event"]),
+            "vrf_id": int(data.get("vrf_id", 0)),
+            "src_ip": data["src_ip"],
+            "x_ip": data["x_ip"],
         }
         return metric
 
-    def parse_port_mapping(
-        self, data: tuple[str | Any], host_ip: str, timestamp: datetime
-    ) -> dict:
+    def parse_port_mapping(self, data: dict, host_ip: str, timestamp: datetime) -> dict:
         __event_type__ = NATEventEnum.PORT_MAPPING
-        if len(data) != 7:
+        if not all(
+            key in data
+            for key in ["event", "protocol", "src_ip", "src_port", "x_ip", "x_port"]
+        ):
             return
 
         logger.debug("Parsing Port Mapping", data=data)
@@ -163,21 +149,33 @@ class NFWareSyslogHandler(GenericSyslogHandler):
             "type": __event_type__,
             "timestamp": timestamp,
             "host": host_ip,
-            "event": self.event_to_enum(data[0]),
-            "vrf_id": int(data[1]),
-            "protocol": int(data[2]),
-            "src_ip": data[3],
-            "src_port": int(data[4]),
-            "x_ip": data[5],
-            "x_port": int(data[6]),
+            "event": self.event_to_enum(data["event"]),
+            "vrf_id": int(data.get("vrf_id", 0)),
+            "protocol": int(data["protocol"]),
+            "src_ip": data["src_ip"],
+            "src_port": int(data["src_port"]),
+            "x_ip": data["x_ip"],
+            "x_port": int(data["x_port"]),
         }
         return metric
 
     def parse_session_mapping(
-        self, data: tuple[str | Any], host_ip: str, timestamp: datetime
+        self, data: dict, host_ip: str, timestamp: datetime
     ) -> dict:
         __event_type__ = NATEventEnum.SESSION_MAPPING
-        if len(data) != 10:
+        if not all(
+            key in data
+            for key in [
+                "event",
+                "protocol",
+                "src_ip",
+                "src_port",
+                "x_ip",
+                "x_port",
+                "dst_ip",
+                "dst_port",
+            ]
+        ):
             return
 
         logger.debug("Parsing Session Mapping", data=data)
@@ -185,23 +183,25 @@ class NFWareSyslogHandler(GenericSyslogHandler):
             "type": __event_type__,
             "timestamp": timestamp,
             "host": host_ip,
-            "event": self.event_to_enum(data[0]),
-            "vrf_id": int(data[1]),
-            "protocol": int(data[2]),
-            "src_ip": data[3],
-            "src_port": data[4],
-            "x_ip": data[5],
-            "x_port": int(data[6]),
-            "dst_ip": data[7],
-            "dst_port": int(data[8]),
+            "event": self.event_to_enum(data["event"]),
+            "vrf_id": int(data.get("vrf_id", 0)),
+            "protocol": int(data["protocol"]),
+            "src_ip": data["src_ip"],
+            "src_port": data["src_port"],
+            "x_ip": data["x_ip"],
+            "x_port": int(data["x_port"]),
+            "dst_ip": data["dst_ip"],
+            "dst_port": int(data["dst_port"]),
         }
         return metric
 
     def parse_port_block_mapping(
-        self, data: tuple[str | Any], host_ip: str, timestamp: datetime
+        self, data: dict, host_ip: str, timestamp: datetime
     ) -> dict:
         __event_type__ = NATEventEnum.PORT_BLOCK_MAPPING
-        if len(data) != 6:
+        if not all(
+            key in data for key in ["event", "src_ip", "x_ip", "start_port", "end_port"]
+        ):
             return
 
         logger.debug("Parsing Port Block Mapping", data=data)
@@ -209,12 +209,12 @@ class NFWareSyslogHandler(GenericSyslogHandler):
             "type": __event_type__,
             "timestamp": timestamp,
             "host": host_ip,
-            "event": self.event_to_enum(data[0]),
-            "vrf_id": int(data[1]),
-            "src_ip": data[2],
-            "x_ip": data[3],
-            "start_port": int(data[4]),
-            "end_port": int(data[5]),
+            "event": self.event_to_enum(data["event"]),
+            "vrf_id": int(data.get("vrf_id", 0)),
+            "src_ip": data["src_ip"],
+            "x_ip": data["x_ip"],
+            "start_port": int(data["start_port"]),
+            "end_port": int(data["end_port"]),
         }
         return metric
 
