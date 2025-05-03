@@ -134,7 +134,7 @@ class GenericSyslogHandler(BaseHandler):
         if (
             not HAS_RUST_BINDINGS
             or not self.regex
-            or not hasattr(self.regex, "match_messages_batch")
+            or not hasattr(self.regex, "match_messages_batch_native")
         ):
             metrics = []
             for message in messages:
@@ -153,13 +153,14 @@ class GenericSyslogHandler(BaseHandler):
             timestamps.append(data["timestamp"])
 
         try:
-            batch_results = self.regex.match_messages_batch(message_texts)
+            batch_results = self.regex.match_messages_batch_native(message_texts)
 
             metrics = []
             for i, result in enumerate(batch_results):
                 if result:
-                    parse_func, event_data = result
-                    parse_method = getattr(self, parse_func)
+                    event_type, capture_data = result
+                    event_data = {k: v for k, v in capture_data}
+                    parse_method = getattr(self, event_type)
                     metric = parse_method(event_data, host_ips[i], timestamps[i])
                     metrics.append(metric)
 
@@ -167,7 +168,7 @@ class GenericSyslogHandler(BaseHandler):
         except Exception as err:
             logger.debug("Failed to batch parse using rust binding", err=str(err))
 
-            # Fallback to sequential processing
+            # Fallback
             metrics = []
             for message in messages:
                 metric = self.parse_message(message)
