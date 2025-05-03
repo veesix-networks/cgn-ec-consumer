@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from structlog import get_logger
 import re
+
+from cgn_ec_models.enums import NATEventEnum
 
 from cgn_ec_consumer.outputs.base import BaseOutput
 
@@ -166,7 +169,7 @@ class GenericSyslogHandler(BaseHandler):
 
             return metrics
         except Exception as err:
-            logger.debug("Failed to batch parse using rust binding", err=str(err))
+            logger.error("Failed to batch parse using rust binding", err=str(err))
 
             # Fallback
             metrics = []
@@ -175,3 +178,108 @@ class GenericSyslogHandler(BaseHandler):
                 if metric:
                     metrics.append(metric)
             return metrics
+
+    def parse_address_mapping(
+        self, data: dict, host_ip: str, timestamp: datetime
+    ) -> dict:
+        __event_type__ = NATEventEnum.ADDRESS_MAPPING
+        if not all(key in data for key in ["event", "src_ip", "x_ip"]):
+            return
+
+        logger.debug("Parsing Address Mapping", data=data)
+        metric = {
+            "type": __event_type__,
+            "timestamp": timestamp,
+            "host": host_ip,
+            "event": self.event_to_enum(data["event"]),
+            "vrf_id": int(data.get("vrf_id", 0)),
+            "src_ip": data["src_ip"],
+            "x_ip": data["x_ip"],
+        }
+        return metric
+
+    def parse_port_mapping(self, data: dict, host_ip: str, timestamp: datetime) -> dict:
+        __event_type__ = NATEventEnum.PORT_MAPPING
+        if not all(
+            key in data
+            for key in ["event", "protocol", "src_ip", "src_port", "x_ip", "x_port"]
+        ):
+            return
+
+        logger.debug("Parsing Port Mapping", data=data)
+        metric = {
+            "type": __event_type__,
+            "timestamp": timestamp,
+            "host": host_ip,
+            "event": self.event_to_enum(data["event"]),
+            "vrf_id": int(data.get("vrf_id", 0)),
+            "protocol": int(data["protocol"]),
+            "src_ip": data["src_ip"],
+            "src_port": int(data["src_port"]),
+            "x_ip": data["x_ip"],
+            "x_port": int(data["x_port"]),
+        }
+        return metric
+
+    def parse_session_mapping(
+        self, data: dict, host_ip: str, timestamp: datetime
+    ) -> dict:
+        __event_type__ = NATEventEnum.SESSION_MAPPING
+        if not all(
+            key in data
+            for key in [
+                "event",
+                "protocol",
+                "src_ip",
+                "src_port",
+                "x_ip",
+                "x_port",
+                "dst_ip",
+                "dst_port",
+            ]
+        ):
+            return
+
+        logger.debug("Parsing Session Mapping", data=data)
+        metric = {
+            "type": __event_type__,
+            "timestamp": timestamp,
+            "host": host_ip,
+            "event": self.event_to_enum(data["event"]),
+            "vrf_id": int(data.get("vrf_id", 0)),
+            "protocol": int(data["protocol"]),
+            "src_ip": data["src_ip"],
+            "src_port": data["src_port"],
+            "x_ip": data["x_ip"],
+            "x_port": int(data["x_port"]),
+            "dst_ip": data["dst_ip"],
+            "dst_port": int(data["dst_port"]),
+        }
+        return metric
+
+    def parse_port_block_mapping(
+        self, data: dict, host_ip: str, timestamp: datetime
+    ) -> dict:
+        __event_type__ = NATEventEnum.PORT_BLOCK_MAPPING
+        if not all(
+            key in data for key in ["event", "src_ip", "x_ip", "start_port", "end_port"]
+        ):
+            return
+
+        logger.debug("Parsing Port Block Mapping", data=data)
+        metric = {
+            "type": __event_type__,
+            "timestamp": timestamp,
+            "host": host_ip,
+            "event": self.event_to_enum(data["event"]),
+            "vrf_id": int(data.get("vrf_id", 0)),
+            "src_ip": data["src_ip"],
+            "x_ip": data["x_ip"],
+            "start_port": int(data["start_port"]),
+            "end_port": int(data["end_port"]),
+        }
+        return metric
+
+    @abstractmethod
+    def event_to_enum(event: str) -> str:
+        raise NotImplementedError("event_to_enum not implemented")
