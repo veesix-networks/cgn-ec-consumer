@@ -10,7 +10,7 @@ def test_config_json(yaml_config: Settings):
     assert yaml_config.BATCH_SIZE
 
     assert yaml_config.HANDLER
-    assert len(yaml_config.OUTPUTS) == 2
+    assert len(yaml_config.OUTPUTS) == 3
 
 
 def test_config_yaml(json_config: Settings):
