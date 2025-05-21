@@ -1,3 +1,4 @@
+from datetime import datetime
 import random
 import socket
 from time import sleep
@@ -82,7 +83,7 @@ def main():
     syslog_server_ip = "localhost"  # Replace with the IP of your syslog server
     syslog_server_port = 1514  # Default UDP port for syslog
 
-    header = "cgn0.thn2/cgn-demo CEF:"
+    header = f"test cgn0.thn2/cgn-demo CEF:"
 
     for message in _get_a10_cef_test_messages():
         print(f"Sending messages: {header}{message}")

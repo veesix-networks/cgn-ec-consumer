@@ -20,7 +20,7 @@ class A10ThunderCEFSyslogHandler(GenericSyslogHandler):
         syslog_message = data["message"]
         host_ip = data["ip"]
         timestamp = data["timestamp"]
-        vrf = data["host"].split("/")[-1]
+        vrf = data.get("program", "").split("/")[-1]
 
         event = self.PARSER.parse_event(syslog_message)
         parse_method = None
