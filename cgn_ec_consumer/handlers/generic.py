@@ -20,6 +20,7 @@ logger.debug("Checking status of rust bindings", HAS_RUST_BINDINGS=HAS_RUST_BIND
 
 class BaseHandler(ABC):
     TOPIC = None
+    PARSER = None
 
     def __init__(self, outputs: list[BaseOutput] = []):
         logger.info(f"Loading Handler: {self.__class__.__name__}")
