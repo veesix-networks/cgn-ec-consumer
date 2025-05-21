@@ -1,7 +1,7 @@
 amqp==5.3.1 ; python_version >= "3.12" and python_version < "4.0"
 annotated-types==0.7.0 ; python_version >= "3.12" and python_version < "4.0"
 certifi==2025.1.31 ; python_version >= "3.12" and python_version < "4.0"
-cgn-ec-models==0.1.1 ; python_version >= "3.12" and python_version < "4.0"
+cgn-ec-models==0.4.0 ; python_version >= "3.12" and python_version < "4.0"
 cgn-ec-rust-parsers==0.2.0 ; python_version >= "3.12" and python_version < "4.0"
 charset-normalizer==3.4.1 ; python_version >= "3.12" and python_version < "4.0"
 confluent-kafka==2.8.2 ; python_version >= "3.12" and python_version < "4.0"

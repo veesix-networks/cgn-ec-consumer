@@ -1,5 +1,6 @@
 __all__ = [
     "A10ThunderSyslogHandler",
+    "A10ThunderCEFSyslogHandler",
     "F5BIGIPSyslogHandler",
     "JuniperJUNOSSyslogHandler",
     "NFWareSyslogHandler",
@@ -8,6 +9,7 @@ __all__ = [
 ]
 
 from cgn_ec_consumer.handlers.a10 import A10ThunderSyslogHandler
+from cgn_ec_consumer.handlers.a10_cef import A10ThunderCEFSyslogHandler
 from cgn_ec_consumer.handlers.f5 import F5BIGIPSyslogHandler
 from cgn_ec_consumer.handlers.juniper import JuniperJUNOSSyslogHandler
 from cgn_ec_consumer.handlers.nfware import (

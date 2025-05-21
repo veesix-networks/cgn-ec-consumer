@@ -12,6 +12,10 @@ class A10ThunderCEFSyslogHandler(GenericSyslogHandler):
     TOPIC = "cgnat.syslog.a10_thunder_cef"
     PARSER = CEFParser()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.regex = None  # Will fix in another PR when I move rust binding logic under the RegexParser()
+
     def parse_message(self, data: dict) -> dict:
         syslog_message = data["message"]
         host_ip = data["ip"]
