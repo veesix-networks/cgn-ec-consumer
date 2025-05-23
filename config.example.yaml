@@ -8,7 +8,7 @@ metrics_port: 4499
 
 # Handler Configuration
 handler:
-  type: "NFWareSyslogHandler"
+  type: "A10ThunderCEFSyslogHandler"
   options: {}
     # Optional regex patterns - will use defaults if not provided
     # regex_patterns:
