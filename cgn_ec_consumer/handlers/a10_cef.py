@@ -17,10 +17,17 @@ class A10ThunderCEFSyslogHandler(GenericSyslogHandler):
         self.regex = None  # Will fix in another PR when I move rust binding logic under the RegexParser()
 
     def parse_message(self, data: dict) -> dict:
+        program = data["program"]
+        if program != "CEF":
+            return
+
         syslog_message = data["message"]
         host_ip = data["ip"]
         timestamp = data["timestamp"]
-        vrf = data.get("program", "").split("/")[-1]
+        if host := data.get("host"):
+            vrf = host.split("/")[-1]
+        else:
+            vrf = "shared"
 
         event = self.PARSER.parse_event(syslog_message)
         parse_method = None
@@ -29,6 +36,10 @@ class A10ThunderCEFSyslogHandler(GenericSyslogHandler):
                 parse_method = self.parse_port_mapping
             case "Nat Port Freed":
                 parse_method = self.parse_port_mapping
+            case "Nat Session Created":
+                parse_method = self.parse_session_mapping
+            case "Nat Session Freed":
+                parse_method = self.parse_session_mapping
             case "Nat Port Batch Pool Allocated":
                 parse_method = self.parse_port_block_mapping
             case "Nat Port Batch Pool Freed":
@@ -48,7 +59,37 @@ class A10ThunderCEFSyslogHandler(GenericSyslogHandler):
     def parse_session_mapping(
         self, data: CEFEvent, host_ip: str, vrf: str, timestamp: datetime
     ):
-        raise NotImplementedError
+        __event_type__ = NATEventEnum.PORT_MAPPING
+        if not all(
+            key in data.extension
+            for key in [
+                "proto",
+                "src",
+                "spt",
+                "sourceTranslatedAddress",
+                "sourceTranslatedPort",
+                "dst",
+                "dpt",
+            ]
+        ):
+            return
+
+        logger.debug("Parsing Session Mapping", data=data)
+        metric = {
+            "type": __event_type__,
+            "timestamp": timestamp,
+            "host": host_ip,
+            "event": self.event_to_enum(data.event_class),
+            "vrf_id": vrf,
+            "protocol": NATProtocolEnum.from_string(data.extension["proto"]),
+            "src_ip": data.extension["src"],
+            "src_port": data.extension["spt"],
+            "x_ip": data.extension["sourceTranslatedAddress"],
+            "x_port": data.extension["sourceTranslatedPort"],
+            "dst_ip": data.extension["dst"],
+            "dst_port": data.extension["dpt"],
+        }
+        return metric
 
     def parse_port_mapping(
         self, data: CEFEvent, host_ip: str, vrf: str, timestamp: datetime
@@ -113,9 +154,9 @@ class A10ThunderCEFSyslogHandler(GenericSyslogHandler):
 
     def event_to_enum(self, event_class: str) -> NATEventTypeEnum:
         match event_class:
-            case "CGN 100" | "CGN 106":
+            case "CGN 100" | "CGN 102" | "CGN 106":
                 return NATEventTypeEnum.CREATED
-            case "CGN 101" | "CGN 107":
+            case "CGN 101" | "CGN 103" | "CGN 107":
                 return NATEventTypeEnum.DELETED
             case _:
                 return NATEventTypeEnum.CREATED

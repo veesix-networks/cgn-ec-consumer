@@ -27,11 +27,7 @@ class CEFParser(BaseParser):
     """
 
     def parse_event(self, event: str) -> CEFEvent:
-        parts = event.split("CEF:", 1)
-        if len(parts) != 2:
-            return
-
-        headers = parts[-1].split("|", 7)
+        headers = event.split("|", 7)
         if len(headers) != 8:
             return
 
