@@ -59,7 +59,7 @@ class A10ThunderCEFSyslogHandler(GenericSyslogHandler):
     def parse_session_mapping(
         self, data: CEFEvent, host_ip: str, vrf: str, timestamp: datetime
     ):
-        __event_type__ = NATEventEnum.PORT_MAPPING
+        __event_type__ = NATEventEnum.SESSION_MAPPING
         if not all(
             key in data.extension
             for key in [
