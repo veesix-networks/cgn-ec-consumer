@@ -3,11 +3,23 @@ kafka_bootstrap_servers: "localhost:9094"
 kafka_group_id: "syslog-consumers"
 kafka_max_records_poll: 500
 batch_size: 30000
+processes: 4
+metrics_port: 4499
 
 # Handler Configuration
 handler:
-  type: "NFWareSyslogHandler"
+  type: "A10ThunderCEFSyslogHandler"
   options: {}
+    # Optional regex patterns - will use defaults if not provided
+    # regex_patterns:
+    #   - regex: "(?P<event>[AD]) VRF (?P<vrf_id>\\d+) INT (?P<src_ip>\\d+\\.\\d+\\.\\d+\\.\\d+) EXT (?P<x_ip>\\d+\\.\\d+\\.\\d+\\.\\d+)$"
+    #     handler: "parse_address_mapping"
+    #   - regex: "(?P<event>[AD]) VRF (?P<vrf_id>\\d+) (?P<protocol>\\d+) INT (?P<src_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):(?P<src_port>\\d+) EXT (?P<x_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):(?P<x_port>\\d+)$"
+    #     handler: "parse_port_mapping"
+    #   - regex: "(?P<event>[AD]) VRF (?P<vrf_id>\\d+) (?P<protocol>\\d+) INT (?P<src_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):(?P<src_port>\\d+) EXT (?P<x_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):(?P<x_port>\\d+) DST (?P<dst_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):(?P<dst_port>\\d+) DIR (?P<direction>OUT|IN)$"
+    #     handler: "parse_session_mapping"
+    #   - regex: "(?P<event>[AD]) VRF (?P<vrf_id>\\d+) INT (?P<src_ip>\\d+\\.\\d+\\.\\d+\\.\\d+) EXT (?P<x_ip>\\d+\\.\\d+\\.\\d+\\.\\d+):(?P<start_port>\\d+)-(?P<end_port>\\d+)$"
+    #     handler: "parse_port_block_mapping"
 
 # Outputs Configuration
 outputs:

@@ -38,18 +38,28 @@ files = [
 
 [[package]]
 name = "cgn-ec-models"
-version = "0.1.1"
+version = "0.4.0"
 description = "Models for cgn-ec"
 optional = false
 python-versions = "<4.0,>=3.12"
 files = [
-    {file = "cgn_ec_models-0.1.1-py3-none-any.whl", hash = "sha256:f03fbc74f28095ec536a773caea0a966fb9ad79a2f174fbf5c3a6b980f2be196"},
-    {file = "cgn_ec_models-0.1.1.tar.gz", hash = "sha256:a8462149741bc247f4e79e0f96d498d380293594f278e54c2ba988b5555c996f"},
+    {file = "cgn_ec_models-0.4.0-py3-none-any.whl", hash = "sha256:0b0a8c5b568a7407696f75eb398e4fe32f8ee442429c76b03d1ef004936c74bb"},
+    {file = "cgn_ec_models-0.4.0.tar.gz", hash = "sha256:89435fa58d2af56eaca050404954f6d40c88b60e5edd986ff0977367ce9a2420"},
 ]
 
 [package.dependencies]
 pydantic = ">=2.10.6,<3.0.0"
 sqlmodel = ">=0.0.24,<0.0.25"
+
+[[package]]
+name = "cgn-ec-rust-parsers"
+version = "0.2.0"
+description = ""
+optional = false
+python-versions = "*"
+files = [
+    {file = "cgn_ec_rust_parsers-0.2.0-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:db41a59b6041b327402f93a3506b4cd1ee45bd33e61a6043c884687d11a7e9d9"},
+]
 
 [[package]]
 name = "charset-normalizer"
@@ -1056,4 +1066,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "380f2ae86e9cf0688bd22c539fe699826efb0a6a1d61c613b589b41da622c9f4"
+content-hash = "55f0d5c21081f4dd9353d3ba2c6bbfb88a8e8b3afeea05b0cc8ac888c40b3e42"

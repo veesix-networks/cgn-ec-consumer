@@ -10,41 +10,20 @@ from structlog import get_logger
 from cgn_ec_models.enums import NATEventTypeEnum, NATEventEnum, NATProtocolEnum
 
 from cgn_ec_consumer.handlers.generic import GenericSyslogHandler
+from cgn_ec_consumer.patterns.f5 import F5_BIGIP_SYSLOG_REGEX_PATTERNS
 
 logger = get_logger("cgn-ec.handlers.f5_bigip")
 
 
 class F5BIGIPSyslogHandler(GenericSyslogHandler):
     TOPIC = "cgnat.syslog.f5_bigip"
-
-    REGEX_SESSION_MAPPING = r"(\S+) (\d+.\d+.\d+.\d+)%(\d+):(\d+) (\d+) (\d+.\d+.\d+.\d+)%\d+:(\d+) (\d+.\d+.\d+.\d+) (\d+)$"
-
-    PATTERNS = [
-        (re.compile(REGEX_SESSION_MAPPING), "parse_session_mapping"),
-    ]
+    DEFAULT_REGEX_PATTERNS = F5_BIGIP_SYSLOG_REGEX_PATTERNS
 
     def parse_session_mapping(
         self, data: tuple[str | Any], host_ip: str, timestamp: datetime
     ) -> dict:
-        __event_type__ = NATEventEnum.SESSION_MAPPING
-        if len(data) != 9:
-            return
-
-        logger.debug("Parsing Session Mapping", data=data)
-        metric = {
-            "type": __event_type__,
-            "timestamp": timestamp,
-            "host": host_ip,
-            "event": self.event_to_enum(data[0]),
-            "vrf_id": int(data[2]),
-            "protocol": NATProtocolEnum(data[4]),
-            "src_ip": data[1],
-            "src_port": data[3],
-            "x_ip": data[5],
-            "x_port": int(data[6]),
-            "dst_ip": data[7],
-            "dst_port": int(data[8]),
-        }
+        data["protocol"] = NATProtocolEnum(data["protocol"])
+        metric = super().parse_session_mapping(data, host_ip, timestamp)
         return metric
 
     def event_to_enum(self, event_str: str):
