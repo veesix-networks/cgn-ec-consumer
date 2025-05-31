@@ -3,6 +3,9 @@ from cgn_ec_consumer.preprocessors.generic import (
     match_kv,
     match_kvs,
     key_exists,
+    exclude_by_kv,
+    exclude_by_kvs,
+    exclude_by_kv_values,
 )
 
 
@@ -11,4 +14,7 @@ preprocessing = {
     "match_kv": match_kv,
     "match_kvs": match_kvs,
     "key_exists": key_exists,
+    "exclude_by_kv": exclude_by_kv,
+    "exclude_by_kvs": exclude_by_kvs,
+    "exclude_by_kv_values": exclude_by_kv_values,
 }
