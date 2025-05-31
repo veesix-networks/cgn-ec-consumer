@@ -9,7 +9,7 @@ from cgn_ec_consumer.preprocessors.generic import (
 )
 
 
-preprocessing = {
+PREPROCESSORS = {
     "filter_keys": filter_keys,
     "match_kv": match_kv,
     "match_kvs": match_kvs,
