@@ -22,7 +22,6 @@ prometheus-client = "^0.21.1"
 amqp = "^5.3.1"
 cgn-ec-rust-parsers = "^0.2.0"
 
-
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
 
