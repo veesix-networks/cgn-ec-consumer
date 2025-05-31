@@ -103,7 +103,8 @@ class Settings(BaseSettings):
             # Instantiate the output with options from config
             output = output_class(**output_config.options)
             if output_config.preprocessors:
-                output.preprocessors = output_config.preprocessors
+                for preprocessor in output_config.preprocessors:
+                    output._load_preprocessor(preprocessor)
             return output
         except (ImportError, AttributeError, ValueError) as e:
             raise ImportError(f"Failed to load output {output_config.type}: {str(e)}")
