@@ -1,6 +1,6 @@
 import pytest
 from abc import ABC, abstractmethod
-from cgn_ec_models.enums import NATEventEnum
+from cgn_ec_consumer.models.enums import NATEventEnum
 
 from cgn_ec_consumer.handlers.generic import BaseSyslogHandler
 

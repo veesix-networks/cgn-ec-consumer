@@ -4,7 +4,7 @@ from typing import Optional
 from structlog import get_logger
 from kafka import KafkaProducer
 
-from cgn_ec_models.enums import NATEventEnum
+from cgn_ec_consumer.models.enums import NATEventEnum
 from cgn_ec_consumer.outputs.base import BaseOutput
 
 logger = get_logger("cgn-ec.outputs.kafka")

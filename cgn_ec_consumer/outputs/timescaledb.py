@@ -1,12 +1,11 @@
 from structlog import get_logger
-from sqlmodel import SQLModel
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.sql import bindparam
-from cgn_ec_models.enums import NATEventEnum
-from cgn_ec_models.sqlmodel import (
+from cgn_ec_consumer.models.enums import NATEventEnum
+from cgn_ec_consumer.models.metrics import (
     NATPortMapping,
     NATAddressMapping,
     NATPortBlockMapping,
@@ -55,7 +54,9 @@ class TimeScaleDBOutput(BaseOutput):
 
     def _create_tables_if_not_exist(self):
         try:
-            SQLModel.metadata.create_all(self._engine)
+            from cgn_ec_consumer.models.metrics import Base
+
+            Base.metadata.create_all(self._engine)
         except SQLAlchemyError as err:
             logger.error(f"Failed to create all tables due to error: {err}")
             raise
