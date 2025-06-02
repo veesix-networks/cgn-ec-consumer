@@ -3,7 +3,7 @@ from datetime import datetime
 from structlog import get_logger
 import re
 
-from cgn_ec_models.enums import NATEventEnum
+from cgn_ec_consumer.models.enums import NATEventEnum
 
 from cgn_ec_consumer.outputs.base import BaseOutput
 

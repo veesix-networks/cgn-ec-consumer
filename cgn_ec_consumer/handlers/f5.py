@@ -3,11 +3,10 @@
 # Fixed-NAT: FIXED-NAT-PORTS 10.10.10.172->192.168.9.173:3000-4000
 
 # Need to handle ASCII, COmpact and Binary logging formats
-import regex as re
 from typing import Any
 from datetime import datetime
 from structlog import get_logger
-from cgn_ec_models.enums import NATEventTypeEnum, NATEventEnum, NATProtocolEnum
+from cgn_ec_consumer.models.enums import NATEventTypeEnum, NATProtocolEnum
 
 from cgn_ec_consumer.handlers.generic import GenericSyslogHandler
 from cgn_ec_consumer.patterns.f5 import F5_BIGIP_SYSLOG_REGEX_PATTERNS

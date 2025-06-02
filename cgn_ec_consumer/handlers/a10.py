@@ -6,7 +6,7 @@
 from typing import Any
 from datetime import datetime
 from structlog import get_logger
-from cgn_ec_models.enums import NATEventTypeEnum, NATEventEnum, NATProtocolEnum
+from cgn_ec_consumer.models.enums import NATEventTypeEnum, NATProtocolEnum
 
 from cgn_ec_consumer.handlers.generic import GenericSyslogHandler
 from cgn_ec_consumer.patterns.a10 import A10_VTHUNDER_SYSLOG_REGEX_PATTERNS

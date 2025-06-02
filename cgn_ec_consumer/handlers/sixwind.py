@@ -4,16 +4,8 @@
 # Port Block Mapping:   Jun 11 08:02:46 vsr fp-cgnat[4269]: CGNAT Log listen on 5001
 #                       Jun 11 08:03:09 vsr fp-cgnat[4269]: USER 100.64.0.1 (matching rule 1): NEW BLOCK (pool "mypool", ip public 192.0.2.33, proto 6, port 1 - 512)
 #                       Jun 11 08:07:30 vsr fp-cgnat[4269]: USER 100.64.0.1 (matching rule 1): DESTROY BLOCK (pool "mypool", ip public 192.0.2.33, proto 6, port 1 - 512)
-
-import re
-from datetime import datetime
 from structlog import get_logger
-from cgn_ec_models.sqlmodel import (
-    MetricBase,
-    NATSessionMapping,
-    NATPortBlockMapping,
-)
-from cgn_ec_models.enums import NATEventTypeEnum
+from cgn_ec_consumer.models.enums import NATEventTypeEnum
 
 from cgn_ec_consumer.handlers.generic import BaseSyslogHandler
 from cgn_ec_consumer.patterns.sixwind import SIXWIND_SYSLOG_REGEX_PATTERS

@@ -7,7 +7,7 @@
 
 from datetime import datetime
 from structlog import get_logger
-from cgn_ec_models.enums import NATEventTypeEnum, NATEventEnum, NATProtocolEnum
+from cgn_ec_consumer.models.enums import NATEventTypeEnum, NATEventEnum, NATProtocolEnum
 
 from cgn_ec_consumer.handlers.generic import (
     GenericSyslogHandler,
