@@ -6,6 +6,7 @@ from sqlalchemy.schema import PrimaryKeyConstraint
 
 Base = declarative_base()
 
+
 class MetricBase(Base):
     __abstract__ = True
 
